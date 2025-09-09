@@ -12,7 +12,7 @@ export function useUser() {
   useEffect(() => {
     let isMounted = true;
     try {
-      const item = window.localStorage.getItem('guardian-angel-user');
+      const item = window.localStorage.getItem('e-mitra-user');
       const parsedUser = item ? (JSON.parse(item) as User) : null;
       
       if (isMounted) {
@@ -39,7 +39,7 @@ export function useUser() {
   }, [router]);
 
   const logout = useCallback(() => {
-    window.localStorage.removeItem('guardian-angel-user');
+    window.localStorage.removeItem('e-mitra-user');
     setUser(null);
     router.replace('/register');
   }, [router]);

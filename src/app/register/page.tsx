@@ -16,7 +16,7 @@ export default function RegisterPage() {
           <Logo />
           <div className="space-y-1">
             <CardTitle className="font-headline text-2xl">
-              Welcome to Guardian Angel
+              Welcome to E-Mitra
             </CardTitle>
             <CardDescription>
               Create an account to get started.

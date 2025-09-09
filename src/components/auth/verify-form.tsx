@@ -49,10 +49,10 @@ export function VerifyForm({ name, mobile }: VerifyFormProps) {
       mobile,
     };
 
-    localStorage.setItem('guardian-angel-user', JSON.stringify(newUser));
+    localStorage.setItem('e-mitra-user', JSON.stringify(newUser));
     toast({
       title: 'Verification Successful!',
-      description: 'Welcome to Guardian Angel.',
+      description: 'Welcome to E-Mitra.',
       variant: 'default',
       className: 'bg-accent text-accent-foreground'
     });

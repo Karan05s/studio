@@ -46,7 +46,7 @@ export function TranslationModal({ isOpen, onOpenChange }: TranslationModalProps
             </li>
           </ul>
           <p>
-            This allows you to experience Guardian Angel in the language you're most comfortable with.
+            This allows you to experience E-Mitra in the language you're most comfortable with.
           </p>
         </div>
       </DialogContent>
