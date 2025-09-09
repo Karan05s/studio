@@ -4,14 +4,30 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Loader, AlertTriangle } from 'lucide-react';
 import type { Position } from '@/types';
+import {
+  GoogleMap,
+  useJsApiLoader,
+  MarkerF,
+} from '@react-google-maps/api';
 
 interface LocationCardProps {
   onPositionChange: (position: Position | null) => void;
 }
 
+const containerStyle = {
+  width: '100%',
+  height: '200px',
+  borderRadius: '0.5rem',
+};
+
 export function LocationCard({ onPositionChange }: LocationCardProps) {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  });
 
   useEffect(() => {
     let watchId: number;
@@ -31,7 +47,8 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
           let message = 'An unknown error occurred.';
           switch (err.code) {
             case err.PERMISSION_DENIED:
-              message = 'Location access denied. Please enable it in your browser settings.';
+              message =
+                'Location access denied. Please enable it in your browser settings.';
               break;
             case err.POSITION_UNAVAILABLE:
               message = 'Location information is unavailable.';
@@ -71,19 +88,31 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
         </div>
       );
     }
-    if (position) {
+    if (isLoaded && position) {
       return (
-        <div className="space-y-2 text-center">
-          <div className="flex items-center justify-center gap-2 font-mono text-lg text-muted-foreground">
-            <span>Lat: {position.latitude.toFixed(5)}</span>
-            <span>Lon: {position.longitude.toFixed(5)}</span>
+        <div className="space-y-2">
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={{ lat: position.latitude, lng: position.longitude }}
+            zoom={15}
+          >
+            <MarkerF
+              position={{ lat: position.latitude, lng: position.longitude }}
+            />
+          </GoogleMap>
+          <div className="text-center">
+            <div className="font-mono text-sm text-muted-foreground">
+              <span>Lat: {position.latitude.toFixed(5)}</span>
+              <span className="ml-4">
+                Lon: {position.longitude.toFixed(5)}
+              </span>
+            </div>
           </div>
-          <p className="text-sm text-green-600">Location is live and updating.</p>
         </div>
       );
     }
     return (
-      <div className="flex flex-col items-center justify-center text-muted-foreground">
+      <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
         <Loader className="mb-2 h-8 w-8 animate-spin" />
         <p>Acquiring your location...</p>
       </div>
@@ -92,11 +121,11 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="flex-row items-center justify-center space-x-2 pb-2">
+      <CardHeader className="flex-row items-center justify-center space-x-2 pb-4">
         <MapPin className="h-5 w-5 text-primary" />
         <CardTitle className="text-xl font-headline">Live Location</CardTitle>
       </CardHeader>
-      <CardContent className="flex h-24 items-center justify-center">
+      <CardContent className="flex min-h-[240px] items-center justify-center p-2">
         {renderContent()}
       </CardContent>
     </Card>
