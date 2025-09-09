@@ -1,0 +1,48 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import type { User } from '@/types';
+
+export function useUser() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    let isMounted = true;
+    try {
+      const item = window.localStorage.getItem('guardian-angel-user');
+      const parsedUser = item ? (JSON.parse(item) as User) : null;
+      
+      if (isMounted) {
+        if (parsedUser) {
+          setUser(parsedUser);
+        } else {
+          router.replace('/register');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse user from localStorage', error);
+      if (isMounted) {
+        router.replace('/register');
+      }
+    } finally {
+      if (isMounted) {
+        setIsLoading(false);
+      }
+    }
+    
+    return () => {
+      isMounted = false;
+    }
+  }, [router]);
+
+  const logout = useCallback(() => {
+    window.localStorage.removeItem('guardian-angel-user');
+    setUser(null);
+    router.replace('/register');
+  }, [router]);
+
+  return { user, isLoading, logout };
+}
