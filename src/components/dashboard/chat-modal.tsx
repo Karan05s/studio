@@ -24,13 +24,8 @@ interface ChatModalProps {
   user: User;
 }
 
-type Message = {
-  role: 'user' | 'model';
-  text: string;
-};
-
 export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,22 +35,25 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', text: input };
-    const newMessages: Message[] = [...messages, userMessage];
-    setMessages(newMessages);
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: [{ text: input }],
+    };
+
+    const currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
     setInput('');
     setIsLoading(true);
     setError(null);
 
-    const history: ChatMessage[] = newMessages.map(msg => ({
-      role: msg.role,
-      content: [{ text: msg.text }],
-    }));
+    const result = await chat(currentMessages);
 
-    const result = await chat(history);
-    
     if (result.success && result.data) {
-      setMessages(prev => [...prev, { role: 'model', text: result.data! }]);
+      const modelMessage: ChatMessage = {
+        role: 'model',
+        content: [{ text: result.data }],
+      };
+      setMessages((prev) => [...prev, modelMessage]);
     } else {
       const errorMessage = result.error || 'An unexpected error occurred.';
       setError(errorMessage);
@@ -69,7 +67,7 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
     }
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div');
@@ -86,7 +84,14 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
     if (isOpen) {
       // Reset chat on open
       setMessages([
-        { role: 'model', text: `Hi ${user.name}! I'm Mitra, your personal safety assistant. How can I help you today?` }
+        {
+          role: 'model',
+          content: [
+            {
+              text: `Hi ${user.name}! I'm Mitra, your personal safety assistant. How can I help you today?`,
+            },
+          ],
+        },
       ]);
       setError(null);
       setInput('');
@@ -117,9 +122,9 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
               >
                 {message.role === 'model' && (
                   <Avatar className="h-8 w-8">
-                     <div className="bg-primary/20 flex items-center justify-center w-full h-full">
-                       <MessageCircle className="h-5 w-5 text-primary" />
-                     </div>
+                    <div className="bg-primary/20 flex items-center justify-center w-full h-full">
+                      <MessageCircle className="h-5 w-5 text-primary" />
+                    </div>
                   </Avatar>
                 )}
                 <div
@@ -129,16 +134,16 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  {message.text}
+                  {message.content[0].text}
                 </div>
-                 {message.role === 'user' && (
+                {message.role === 'user' && (
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                 )}
               </div>
             ))}
-             {isLoading && (
+            {isLoading && (
               <div className="flex items-end gap-2 justify-start">
                 <Avatar className="h-8 w-8">
                   <div className="bg-primary/20 flex items-center justify-center w-full h-full">
@@ -151,10 +156,10 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
               </div>
             )}
             {error && (
-               <div className="flex items-center gap-2 text-sm text-destructive">
-                 <AlertTriangle className="h-4 w-4" />
-                 <p>{error}</p>
-               </div>
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <p>{error}</p>
+              </div>
             )}
           </div>
         </ScrollArea>
