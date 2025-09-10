@@ -28,16 +28,20 @@ interface TranslationModalProps {
 }
 
 const languages = [
+  { value: 'Hindi', label: 'Hindi' },
+  { value: 'Marathi', label: 'Marathi' },
+  { value: 'Tamil', label: 'Tamil' },
+  { value: 'Bengali', label: 'Bengali' },
+  { value: 'Telugu', label: 'Telugu' },
+  { value: 'Gujarati', label: 'Gujarati' },
   { value: 'Spanish', label: 'Spanish' },
   { value: 'French', label: 'French' },
   { value: 'German', label: 'German' },
   { value: 'Japanese', label: 'Japanese' },
   { value: 'Mandarin', label: 'Mandarin' },
-  { value: 'Hindi', label: 'Hindi' },
   { value: 'Arabic', label: 'Arabic' },
   { value: 'Russian', label: 'Russian' },
   { value: 'Portuguese', label: 'Portuguese' },
-  { value: 'Bengali', label: 'Bengali' },
 ];
 
 export function TranslationModal({
@@ -45,7 +49,7 @@ export function TranslationModal({
   onOpenChange,
 }: TranslationModalProps) {
   const [text, setText] = useState('');
-  const [targetLanguage, setTargetLanguage] = useState('Spanish');
+  const [targetLanguage, setTargetLanguage] = useState('Hindi');
   const [translatedText, setTranslatedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
