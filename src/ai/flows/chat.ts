@@ -21,47 +21,13 @@ export async function chat(
   history: ChatMessage[],
   message: ChatMessage
 ): Promise<string> {
+  const { response } = await ai.generate({
+    history: history.map((m) => ({
+      role: m.role,
+      content: [{ text: m.content }],
+    })),
+    prompt: message.content,
+  });
 
-  const anki = ai.definePrompt(
-    {
-      name: 'chatPrompt',
-      input: {
-        schema: z.object({
-          history: z.array(ChatMessageSchema),
-          message: ChatMessageSchema,
-        }),
-      },
-      prompt: `You are an expert AI assistant named Mitra.
-      
-This is the conversation history:
-{{#each history}}
-{{#if (eq role 'user')}}
-User: {{content}}
-{{/if}}
-{{#if (eq role 'model')}}
-Mitra: {{content}}
-{{/if}}
-{{/each}}
-
-This is the user's latest message:
-User: {{message.content}}
-
-This is your response:
-`,
-    },
-    async (input) => {
-      const { response } = await ai.generate({
-        prompt: input.prompt,
-        history: input.history.map((m) => ({
-          role: m.role,
-          content: [{ text: m.content }],
-        })),
-        
-      });
-      return { response: response.text };
-    }
-  );
-
-  const ankiResponse = await anki({ history, message });
-  return ankiResponse.response;
+  return response.text;
 }
