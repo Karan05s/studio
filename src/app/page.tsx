@@ -8,7 +8,6 @@ import { LocationCard } from '@/components/dashboard/location-card';
 import { ActionsBar } from '@/components/dashboard/actions-bar';
 import { SosModal } from '@/components/dashboard/sos-modal';
 import { SuggestionsModal } from '@/components/dashboard/suggestions-modal';
-import { ChatModal } from '@/components/dashboard/chat-modal';
 import { TranslationModal } from '@/components/dashboard/translation-modal';
 import { Logo } from '@/components/logo';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,7 +29,6 @@ export default function DashboardPage() {
   const { user, isLoading, logout } = useUser();
   const [isSosOpen, setSosOpen] = useState(false);
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
-  const [isChatOpen, setChatOpen] = useState(false);
   const [isTranslationOpen, setTranslationOpen] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
 
@@ -51,7 +49,6 @@ export default function DashboardPage() {
         <ActionsBar
           onSos={() => setSosOpen(true)}
           onSuggestions={() => setSuggestionsOpen(true)}
-          onChat={() => setChatOpen(true)}
           onTranslate={() => setTranslationOpen(true)}
         />
         {/* Modals */}
@@ -65,7 +62,6 @@ export default function DashboardPage() {
           onOpenChange={setSuggestionsOpen}
           position={position}
         />
-        <ChatModal isOpen={isChatOpen} onOpenChange={setChatOpen} />
         <TranslationModal
           isOpen={isTranslationOpen}
           onOpenChange={setTranslationOpen}

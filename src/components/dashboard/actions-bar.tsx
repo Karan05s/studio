@@ -12,32 +12,23 @@ import { Button } from '@/components/ui/button';
 interface ActionsBarProps {
   onSos: () => void;
   onSuggestions: () => void;
-  onChat: () => void;
   onTranslate: () => void;
 }
 
 export function ActionsBar({
   onSos,
   onSuggestions,
-  onChat,
   onTranslate,
 }: ActionsBarProps) {
   return (
     <div className="sticky bottom-0 left-0 right-0 z-10 w-full border-t bg-card/80 p-2 backdrop-blur-sm">
-      <div className="mx-auto grid max-w-lg grid-cols-4 gap-2">
+      <div className="mx-auto grid max-w-lg grid-cols-3 gap-2">
         <ActionButton
           icon={Lightbulb}
           label="Tips"
           onClick={onSuggestions}
           variant="ghost"
         />
-        <ActionButton
-          icon={MessageSquare}
-          label="Chat"
-          onClick={onChat}
-          variant="ghost"
-        />
-
         <ActionButton
           icon={Languages}
           label="Translate"
