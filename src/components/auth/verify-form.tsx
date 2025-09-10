@@ -44,7 +44,7 @@ export function VerifyForm({ name, mobile }: VerifyFormProps) {
     // In a real app, we'd verify the OTP with a backend. Here we mock success.
     console.log('Verifying OTP:', values.otp);
     const newUser: User = {
-      id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: Math.random().toString().slice(2, 14),
       name,
       mobile,
     };
@@ -54,7 +54,7 @@ export function VerifyForm({ name, mobile }: VerifyFormProps) {
       title: 'Verification Successful!',
       description: 'Welcome to E-Mitra.',
       variant: 'default',
-      className: 'bg-accent text-accent-foreground'
+      className: 'bg-accent text-accent-foreground',
     });
     router.replace('/');
   }

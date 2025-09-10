@@ -13,6 +13,7 @@ import { TranslationModal } from '@/components/dashboard/translation-modal';
 import { Logo } from '@/components/logo';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Position } from '@/types';
+import { UserIDCard } from '@/components/dashboard/user-id-card';
 
 const DashboardLoadingSkeleton: FC = () => (
   <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4">
@@ -43,6 +44,7 @@ export default function DashboardPage() {
         <Header user={user} onLogout={logout} />
         <main className="flex-grow p-4 md:p-6">
           <div className="mx-auto max-w-4xl space-y-6">
+            <UserIDCard user={user} />
             <LocationCard onPositionChange={setPosition} />
           </div>
         </main>
