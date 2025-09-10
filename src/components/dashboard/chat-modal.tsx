@@ -23,6 +23,12 @@ interface ChatModalProps {
   user: User;
 }
 
+const suggestedQuestions = [
+  'What are some tips for solo travelers?',
+  'How do I stay safe in a new city?',
+  'What should I do if I feel unsafe?',
+];
+
 export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -31,12 +37,13 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (messageContent?: string) => {
+    const content = (messageContent || input).trim();
+    if (!content) return;
 
     const userMessage: ChatMessage = {
       role: 'user',
-      content: input,
+      content,
     };
 
     const currentMessages = [...messages, userMessage];
@@ -138,6 +145,24 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
                 )}
               </div>
             ))}
+            {messages.length === 1 && !isLoading && (
+              <div className="flex flex-col items-start gap-2 pt-4">
+                <p className="text-sm text-muted-foreground px-2">
+                  Or try one of these:
+                </p>
+                {suggestedQuestions.map((question) => (
+                  <Button
+                    key={question}
+                    variant="outline"
+                    size="sm"
+                    className="h-auto w-auto"
+                    onClick={() => handleSend(question)}
+                  >
+                    {question}
+                  </Button>
+                ))}
+              </div>
+            )}
             {isLoading && (
               <div className="flex items-end gap-2 justify-start">
                 <Avatar className="h-8 w-8">
@@ -167,7 +192,10 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
             disabled={isLoading}
             className="flex-grow"
           />
-          <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+          <Button
+            onClick={() => handleSend()}
+            disabled={isLoading || !input.trim()}
+          >
             {isLoading ? (
               <Loader className="h-4 w-4 animate-spin" />
             ) : (
