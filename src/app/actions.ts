@@ -12,6 +12,7 @@ import {
   translateText,
   type TranslateTextInput,
 } from '@/ai/flows/translate-text';
+import { chat as chatFlow, type ChatMessage } from '@/ai/flows/chat';
 
 export async function getSafetySuggestions(
   input: GenerateSafetySuggestionsInput
@@ -45,5 +46,15 @@ export async function getTranslation(input: TranslateTextInput) {
   } catch (error) {
     console.error('Error in getTranslation:', error);
     return { success: false, error: 'Failed to translate text.' };
+  }
+}
+
+export async function chat(history: ChatMessage[]) {
+   try {
+    const result = await chatFlow(history);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error in chat:', error);
+    return { success: false, error: 'Failed to get chat response.' };
   }
 }
