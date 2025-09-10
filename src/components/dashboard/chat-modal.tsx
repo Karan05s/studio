@@ -17,7 +17,6 @@ import { chat } from '@/app/actions';
 import type { ChatMessage } from '@/ai/flows/chat';
 import type { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { Logo } from '../logo';
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -41,13 +40,13 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const newMessages: Message[] = [...messages, { role: 'user', text: input }];
+    const userMessage: Message = { role: 'user', text: input };
+    const newMessages: Message[] = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
     setError(null);
 
-    // Convert local message format to the format expected by the AI flow
     const history: ChatMessage[] = newMessages.map(msg => ({
       role: msg.role,
       content: [{ text: msg.text }],
@@ -58,11 +57,12 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
     if (result.success && result.data) {
       setMessages(prev => [...prev, { role: 'model', text: result.data! }]);
     } else {
-      setError(result.error || 'An unexpected error occurred.');
+      const errorMessage = result.error || 'An unexpected error occurred.';
+      setError(errorMessage);
       toast({
         variant: 'destructive',
         title: 'Chat Error',
-        description: result.error,
+        description: errorMessage,
       });
       // Revert optimistic update
       setMessages(messages);
@@ -72,10 +72,13 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
   
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+      const viewport = scrollAreaRef.current.querySelector('div');
+      if (viewport) {
+        viewport.scrollTo({
+          top: viewport.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
     }
   }, [messages, isLoading]);
 

@@ -17,12 +17,8 @@ const ChatMessageSchema = z.object({
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
-const ChatInputSchema = z.array(ChatMessageSchema);
-
 export async function chat(history: ChatMessage[]): Promise<string> {
-  // The `generate` function expects a `MessageData[]` type.
-  // The incoming history from the client matches this structure, so we can cast it.
-  const messages = (history as unknown) as MessageData[];
+  const messages = history as MessageData[];
 
   const { output } = await ai.generate({
     prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.
@@ -32,5 +28,10 @@ If a user seems to be in distress, provide calming and reassuring language. Prio
 If asked about topics outside of safety, politely steer the conversation back to your purpose.`,
     history: messages,
   });
-  return output!;
+
+  const text = output?.text;
+  if (text === undefined) {
+    throw new Error('No text was returned from the AI.');
+  }
+  return text;
 }
