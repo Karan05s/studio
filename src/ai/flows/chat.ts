@@ -9,16 +9,15 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { MessageData } from 'genkit/generate';
+import type { ChatMessage } from '@/types';
 
-const ChatMessageSchema = z.object({
-  role: z.enum(['user', 'model']),
-  content: z.array(z.object({ text: z.string() })),
-});
-
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+export { type ChatMessage } from '@/types';
 
 export async function chat(history: ChatMessage[]): Promise<string> {
-  const messages = history as MessageData[];
+  const messages: MessageData[] = history.map((message) => ({
+    role: message.role,
+    content: [{ text: message.content }],
+  }));
 
   const { output } = await ai.generate({
     prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.

@@ -14,8 +14,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, Loader, AlertTriangle } from 'lucide-react';
 import { chat } from '@/app/actions';
-import type { ChatMessage } from '@/ai/flows/chat';
-import type { User } from '@/types';
+import type { ChatMessage, User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface ChatModalProps {
@@ -37,7 +36,7 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
 
     const userMessage: ChatMessage = {
       role: 'user',
-      content: [{ text: input }],
+      content: input,
     };
 
     const currentMessages = [...messages, userMessage];
@@ -51,7 +50,7 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
     if (result.success && result.data) {
       const modelMessage: ChatMessage = {
         role: 'model',
-        content: [{ text: result.data }],
+        content: result.data,
       };
       setMessages((prev) => [...prev, modelMessage]);
     } else {
@@ -86,11 +85,7 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
       setMessages([
         {
           role: 'model',
-          content: [
-            {
-              text: `Hi ${user.name}! I'm Mitra, your personal safety assistant. How can I help you today?`,
-            },
-          ],
+          content: `Hi ${user.name}! I'm Mitra, your personal safety assistant. How can I help you today?`,
         },
       ]);
       setError(null);
@@ -134,7 +129,7 @@ export function ChatModal({ isOpen, onOpenChange, user }: ChatModalProps) {
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  {message.content[0].text}
+                  {message.content}
                 </div>
                 {message.role === 'user' && (
                   <Avatar className="h-8 w-8">
