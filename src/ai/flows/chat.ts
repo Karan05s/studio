@@ -10,44 +10,27 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { MessageData } from 'genkit/generate';
 
-// Define the schema for a single message part (currently only text is supported)
-const ChatPartSchema = z.object({
-  text: z.string(),
-});
-
-// Define the schema for a single message in the history
 const ChatMessageSchema = z.object({
   role: z.enum(['user', 'model']),
-  content: z.array(ChatPartSchema),
+  content: z.array(z.object({ text: z.string() })),
 });
+
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 const ChatInputSchema = z.array(ChatMessageSchema);
-const ChatOutputSchema = z.string();
 
 export async function chat(history: ChatMessage[]): Promise<string> {
-  return chatFlow(history);
-}
+  // The `generate` function expects a `MessageData[]` type.
+  // The incoming history from the client matches this structure, so we can cast it.
+  const messages = (history as unknown) as MessageData[];
 
-const chatFlow = ai.defineFlow(
-  {
-    name: 'chatFlow',
-    inputSchema: ChatInputSchema,
-    outputSchema: ChatOutputSchema,
-  },
-  async (history) => {
-    // The prompt expects a simple array of messages, but the `generate` function
-    // requires a `MessageData[]` type. We cast it here.
-    const messages = (history as unknown) as MessageData[];
-
-    const { output } = await ai.generate({
-      prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.
+  const { output } = await ai.generate({
+    prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.
 
 Keep your responses concise, clear, and easy to understand.
 If a user seems to be in distress, provide calming and reassuring language. Prioritize their safety.
 If asked about topics outside of safety, politely steer the conversation back to your purpose.`,
-      history: messages,
-    });
-    return output!;
-  }
-);
+    history: messages,
+  });
+  return output!;
+}
