@@ -52,7 +52,8 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
@@ -73,8 +74,8 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
         description: result.error,
       });
       // Add the user's message back to the input if the API call fails
+      setMessages(messages);
       setInput(input);
-      setMessages(messages)
     }
     setIsLoading(false);
   };
