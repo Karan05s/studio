@@ -9,7 +9,6 @@ import { ActionsBar } from '@/components/dashboard/actions-bar';
 import { SosModal } from '@/components/dashboard/sos-modal';
 import { SuggestionsModal } from '@/components/dashboard/suggestions-modal';
 import { TranslationModal } from '@/components/dashboard/translation-modal';
-import { ChatModal } from '@/components/dashboard/chat-modal';
 import { Logo } from '@/components/logo';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Position } from '@/types';
@@ -31,7 +30,6 @@ export default function DashboardPage() {
   const [isSosOpen, setSosOpen] = useState(false);
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isTranslationOpen, setTranslationOpen] = useState(false);
-  const [isChatOpen, setChatOpen] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
 
   if (isLoading || !user) {
@@ -52,7 +50,6 @@ export default function DashboardPage() {
           onSos={() => setSosOpen(true)}
           onSuggestions={() => setSuggestionsOpen(true)}
           onTranslate={() => setTranslationOpen(true)}
-          onChat={() => setChatOpen(true)}
         />
         {/* Modals */}
         <SosModal
@@ -68,10 +65,6 @@ export default function DashboardPage() {
         <TranslationModal
           isOpen={isTranslationOpen}
           onOpenChange={setTranslationOpen}
-        />
-        <ChatModal
-          isOpen={isChatOpen}
-          onOpenChange={setChatOpen}
         />
       </div>
     </>

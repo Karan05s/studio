@@ -8,7 +8,6 @@ import {
   generateSafetyTips,
   type SafetyTipsInput,
 } from '@/ai/flows/context-aware-safety-tips';
-import { chat, type ChatMessage } from '@/ai/flows/chat';
 
 export async function getSafetySuggestions(
   input: GenerateSafetySuggestionsInput
@@ -32,18 +31,5 @@ export async function getContextualSafetyTips(input: SafetyTipsInput) {
   } catch (error) {
     console.error('Error in getContextualSafetyTips:', error);
     return { success: false, error: 'Failed to generate contextual safety tips.' };
-  }
-}
-
-export async function getChatResponse(
-  history: ChatMessage[],
-  message: ChatMessage
-) {
-  try {
-    const result = await chat(history, message);
-    return { success: true, data: result };
-  } catch (error) {
-    console.error('Error in getChatResponse:', error);
-    return { success: false, error: 'Failed to get a response from the chatbot.' };
   }
 }
