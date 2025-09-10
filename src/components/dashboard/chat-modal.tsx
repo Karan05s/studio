@@ -52,9 +52,9 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    const newMessages = [...messages, userMessage];
-    
-    setMessages(newMessages);
+    const currentMessages = [...messages, userMessage];
+
+    setMessages(currentMessages);
     setInput('');
     setIsLoading(true);
 
