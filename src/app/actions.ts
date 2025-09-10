@@ -8,6 +8,10 @@ import {
   generateSafetyTips,
   type SafetyTipsInput,
 } from '@/ai/flows/context-aware-safety-tips';
+import {
+  translateText,
+  type TranslateTextInput,
+} from '@/ai/flows/translate-text';
 
 export async function getSafetySuggestions(
   input: GenerateSafetySuggestionsInput
@@ -31,5 +35,15 @@ export async function getContextualSafetyTips(input: SafetyTipsInput) {
   } catch (error) {
     console.error('Error in getContextualSafetyTips:', error);
     return { success: false, error: 'Failed to generate contextual safety tips.' };
+  }
+}
+
+export async function getTranslation(input: TranslateTextInput) {
+  try {
+    const result = await translateText(input);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error in getTranslation:', error);
+    return { success: false, error: 'Failed to translate text.' };
   }
 }
