@@ -9,9 +9,17 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send, Bot } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Send, Bot, Loader } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState, useRef, useEffect } from 'react';
+import { getChatResponse } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
+
+interface Message {
+  role: 'user' | 'model';
+  content: string;
+}
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -19,14 +27,57 @@ interface ChatModalProps {
 }
 
 export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
-  const messages = [
-    { from: 'bot', text: 'Welcome to the support chat. How can I help you?' },
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([
     {
-      from: 'user',
-      text: 'I feel a bit unsafe in my current location.',
+      role: 'model',
+      content: 'Welcome to the support chat. I am Mitra, how can I help you?',
     },
-    { from: 'bot', text: 'I understand. Please press the SOS button if you are in immediate danger. Otherwise, I can provide some safety tips.' },
-  ];
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage: Message = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    const history = messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    const result = await getChatResponse({ history, message: input });
+
+    if (result.success && result.data) {
+      const botMessage: Message = { role: 'model', content: result.data.message };
+      setMessages((prev) => [...prev, botMessage]);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.error,
+      });
+      // Add the user's message back to the input if the API call fails
+      setInput(input);
+      setMessages(messages)
+    }
+    setIsLoading(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -37,16 +88,16 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
             Chat with our support bot for assistance.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-96 w-full border-y p-4">
-          <div className="flex flex-col gap-4">
+        <ScrollArea className="h-96 w-full border-y" ref={scrollAreaRef}>
+          <div className="flex flex-col gap-4 p-4">
             {messages.map((msg, index) => (
               <div
                 key={index}
                 className={`flex items-end gap-2 ${
-                  msg.from === 'user' ? 'justify-end' : ''
+                  msg.role === 'user' ? 'justify-end' : ''
                 }`}
               >
-                {msg.from === 'bot' && (
+                {msg.role === 'model' && (
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       <Bot className="h-5 w-5" />
@@ -55,28 +106,48 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
                 )}
                 <div
                   className={`max-w-[75%] rounded-lg p-3 text-sm ${
-                    msg.from === 'user'
+                    msg.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}
                 >
-                  {msg.text}
+                  {msg.content}
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex items-end gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    <Bot className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex items-center space-x-2 rounded-lg bg-muted p-3">
+                  <Loader className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Mitra is thinking...</span>
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
         <div className="p-4">
-          <div className="relative">
-            <Input placeholder="Type your message..." className="pr-12" />
+          <form onSubmit={handleSend} className="relative">
+            <Input
+              placeholder="Type your message..."
+              className="pr-12"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading}
+            />
             <Button
               type="submit"
               size="icon"
               className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-10"
+              disabled={isLoading || !input.trim()}
             >
               <Send className="h-4 w-4" />
             </Button>
-          </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>
