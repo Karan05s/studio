@@ -8,3 +8,8 @@ export interface Position {
   latitude: number;
   longitude: number;
 }
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  content: string;
+}
