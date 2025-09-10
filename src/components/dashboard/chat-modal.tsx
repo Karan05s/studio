@@ -49,35 +49,39 @@ export function ChatModal({ isOpen, onOpenChange }: ChatModalProps) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    const currentMessages = [...messages, userMessage];
-    setMessages(currentMessages);
+    const newMessages = [...messages, userMessage];
+    
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
-    const history = messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    try {
+      const result = await getChatResponse({
+        history: messages, // Send history *before* adding the new user message
+        message: userMessage.content,
+      });
 
-    const result = await getChatResponse({ history, message: input });
-
-    if (result.success && result.data) {
-      const botMessage: Message = { role: 'model', content: result.data.message };
-      setMessages((prev) => [...prev, botMessage]);
-    } else {
+      if (result.success && result.data) {
+        const botMessage: Message = { role: 'model', content: result.data.message };
+        setMessages((prev) => [...prev, botMessage]);
+      } else {
+        throw new Error(result.error || 'Failed to get chat response.');
+      }
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: result.error,
+        description: (error as Error).message,
       });
-      // Add the user's message back to the input if the API call fails
+      // If the API call fails, remove the user's message to allow them to try again.
       setMessages(messages);
-      setInput(input);
+      setInput(userMessage.content);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
