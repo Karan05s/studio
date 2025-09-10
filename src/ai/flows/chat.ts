@@ -8,7 +8,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { MessageData, Part } from 'genkit/generate';
+import { MessageData } from 'genkit/generate';
 
 // Define the schema for a single message part (currently only text is supported)
 const ChatPartSchema = z.object({
@@ -29,23 +29,6 @@ export async function chat(history: ChatMessage[]): Promise<string> {
   return chatFlow(history);
 }
 
-const prompt = ai.definePrompt({
-  name: 'chatPrompt',
-  input: { schema: ChatInputSchema },
-  output: { schema: ChatOutputSchema },
-  prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.
-
-Keep your responses concise, clear, and easy to understand.
-If a user seems to be in distress, provide calming and reassuring language. Prioritize their safety.
-If asked about topics outside of safety, politely steer the conversation back to your purpose.
-
-Converse with the user based on the following history:
-{{#each input}}
-{{role}}: {{#each content}}{{text}}{{/each}}
-{{/each}}
-`,
-});
-
 const chatFlow = ai.defineFlow(
   {
     name: 'chatFlow',
@@ -57,7 +40,14 @@ const chatFlow = ai.defineFlow(
     // requires a `MessageData[]` type. We cast it here.
     const messages = (history as unknown) as MessageData[];
 
-    const { output } = await prompt(messages);
+    const { output } = await ai.generate({
+      prompt: `You are Mitra, a friendly and empathetic personal safety assistant. Your primary goal is to help users feel safe and provide them with relevant information and support.
+
+Keep your responses concise, clear, and easy to understand.
+If a user seems to be in distress, provide calming and reassuring language. Prioritize their safety.
+If asked about topics outside of safety, politely steer the conversation back to your purpose.`,
+      history: messages,
+    });
     return output!;
   }
 );
