@@ -61,7 +61,7 @@ export function RegisterForm() {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} className="pl-10" />
+                  <Input placeholder="E- Mitra" {...field} className="pl-10" />
                 </FormControl>
               </div>
               <FormMessage />
