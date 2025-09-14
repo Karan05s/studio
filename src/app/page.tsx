@@ -42,9 +42,11 @@ export default function DashboardPage() {
     <>
       <div className="flex min-h-screen flex-col bg-background">
         <Header user={user} onLogout={logout} />
-        <main className="flex-grow p-4 md:p-6">
-          <div className="mx-auto max-w-4xl space-y-6">
+        <main className="flex-grow">
+          <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
             <UserIDCard user={user} />
+          </div>
+          <div className="p-2 md:p-6">
             <LocationCard onPositionChange={setPosition} />
           </div>
         </main>
