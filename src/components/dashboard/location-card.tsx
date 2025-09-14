@@ -16,7 +16,7 @@ interface LocationCardProps {
 
 const containerStyle = {
   width: '100%',
-  height: '200px',
+  height: '300px',
   borderRadius: '0.5rem',
 };
 
@@ -135,7 +135,7 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
         <MapPin className="h-5 w-5 text-primary" />
         <CardTitle className="text-xl font-headline">Live Location</CardTitle>
       </CardHeader>
-      <CardContent className="flex min-h-[240px] items-center justify-center p-2">
+      <CardContent className="flex min-h-[340px] items-center justify-center p-2">
         {renderContent()}
       </CardContent>
     </Card>
