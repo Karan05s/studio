@@ -23,10 +23,11 @@ const containerStyle = {
 export function LocationCard({ onPositionChange }: LocationCardProps) {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey,
   });
 
   useEffect(() => {
@@ -87,6 +88,15 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
           <p className="text-sm">{error}</p>
         </div>
       );
+    }
+    if (loadError) {
+      return (
+         <div className="flex flex-col items-center justify-center text-center text-destructive">
+          <AlertTriangle className="mb-2 h-8 w-8" />
+          <p className="font-semibold">Map Loading Error</p>
+          <p className="text-sm">Could not load Google Maps. Please check the API key and its configuration.</p>
+        </div>
+      )
     }
     if (isLoaded && position) {
       return (
