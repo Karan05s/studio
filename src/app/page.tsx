@@ -45,8 +45,6 @@ export default function DashboardPage() {
         <main className="flex-grow">
           <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
             <UserIDCard user={user} />
-          </div>
-          <div className="p-2 md:p-6">
             <LocationCard onPositionChange={setPosition} />
           </div>
         </main>

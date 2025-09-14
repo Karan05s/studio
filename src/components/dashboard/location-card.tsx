@@ -16,7 +16,7 @@ interface LocationCardProps {
 
 const containerStyle = {
   width: '100%',
-  height: '600px',
+  height: '100%',
   borderRadius: '0.5rem',
 };
 
@@ -100,7 +100,7 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
     }
     if (isLoaded && position) {
       return (
-        <div className="space-y-2">
+        <div className="w-full aspect-square">
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={{ lat: position.latitude, lng: position.longitude }}
@@ -110,7 +110,7 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
               position={{ lat: position.latitude, lng: position.longitude }}
             />
           </GoogleMap>
-          <div className="text-center">
+          <div className="text-center mt-2">
             <div className="font-mono text-sm text-muted-foreground">
               <span>Lat: {position.latitude.toFixed(5)}</span>
               <span className="ml-4">
@@ -135,7 +135,7 @@ export function LocationCard({ onPositionChange }: LocationCardProps) {
         <MapPin className="h-5 w-5 text-primary" />
         <CardTitle className="text-xl font-headline">Live Location</CardTitle>
       </CardHeader>
-      <CardContent className="flex min-h-[640px] items-center justify-center p-2">
+      <CardContent className="flex items-center justify-center p-2">
         {renderContent()}
       </CardContent>
     </Card>
